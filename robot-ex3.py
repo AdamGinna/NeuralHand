@@ -6,7 +6,7 @@ from examples import Point
 from examples import Examples
 from nn import Neural_Network
 
-arm_length = 50.0
+arm_length = 75.0
 pygame.init()
 pygame.font.init()
 myfont = pygame.font.SysFont('Open Sans', 24)
@@ -23,12 +23,13 @@ def alpha_point(alpha, beta, center):
 def unstandarise(ang):
     #ang_x= np.array(ang)/np.pi*0.8 - 0.1
     ang_x= np.array(ang)*np.pi
+    #ang_x= (np.array(ang)+0.1)*np.pi/0.8
     return ang_x
 
 def main():
     
     ex = Examples(arm_length)
-    e = ex.generate(1000)
+    e = ex.generate(10000)
 
     #fig, ax = plt.subplots()
     #ax.axis('equal')
@@ -39,13 +40,21 @@ def main():
     np.max(e[0]), np.max(e[1])
     x_train = (np.array(e[0]) + arm_length*2.0)/(arm_length*4.0)*0.8 + 0.1
     y_train = np.array(e[1])/np.pi*0.8 + 0.1
-    NN = Neural_Network()
-    for i in range(5000):
+    NN = Neural_Network(layers=(2,10,2))
+    for i in range(2000):
         NN.train(x_train, y_train)
     
     err = NN.errors
     plt.plot(range(len(err)), err)
     plt.show()
+
+    ex2 = Examples(arm_length)
+    e2 = ex2.generate(10)
+    xx = (np.array(e2[0]) + arm_length*2.0)/(arm_length*4.0)*0.8 + 0.1
+    yy = np.array(e2[1])/np.pi*0.8 + 0.1
+    print( yy - NN.forward(xx))
+
+
 
     screen.fill((255, 255, 255))
     image = pygame.image.load('robot.png')

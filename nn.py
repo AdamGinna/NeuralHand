@@ -3,15 +3,12 @@ import matplotlib.pyplot as plt
 
 class Neural_Network(object):
 
-  def __init__(self, eta=0.01):
-    self.input_size = 2
-    self.hidden_size = 10
-    self.output_size = 2
+  def __init__(self, eta=0.01, layers=(2,10,2)):
     self.eta = eta
     self.errors = []
-
-    self.W1 = np.random.randn(self.input_size, self.hidden_size)
-    self.W2 = np.random.randn(self.hidden_size, self.output_size)
+    self.layers =[ np.random.randn(layers[_], layers[_+1]) for _ in range(len(layers)-1) ]
+    self.output_size = layers[-1]
+    self.input_size = layers[0]
 
   def sigmoid(self, x):
     return 1./(1 + np.exp(-x))
@@ -20,24 +17,28 @@ class Neural_Network(object):
     return s * (1 - s) 
 
   def forward(self, x):
-    self.y0 = np.array(x).copy()
-    self.a1 = np.dot(self.y0, self.W1)
-    self.y1 = self.sigmoid(self.a1)
-    self.a2 = np.dot(self.y1, self.W2)
-    self.y2 = self.sigmoid(self.a2)
-    return self.y2
+    self.y = []
+    self.y.append( np.array(x).copy() ) 
+    for i in range(len(self.layers)):
+      a = np.dot(self.y[i], self.layers[i])
+      self.y.append(self.sigmoid(a))
+    return self.y[-1]
+
+
 
   def backward(self, output):
-    self.epsilon_2 = output - self.y2
-    self.delta_2 = self.epsilon_2 * self.sigmoid_derivative(self.y2)
-
-    self.epsilon_1 = self.delta_2.dot(self.W2.T)
-    self.delta_1 = self.epsilon_1 * self.sigmoid_derivative(self.y1)
-    
-    self.W2 += self.eta * self.y1.T.dot(self.delta_2)
-    self.W1 += self.eta * self.y0.T.dot(self.delta_1)
+    delta = []
+    epsilon = output - self.y[-1]
+    delta.append( epsilon * self.sigmoid_derivative(self.y[-1]) ) 
+    for i in range(len(self.layers)-1,0,-1):
+      epsilon = delta[-1].dot(self.layers[i].T)
+      delta.append( epsilon * self.sigmoid_derivative(self.y[i]) ) 
+    delta.reverse()
+    for i in range(len(self.layers)):
+      self.layers[i] += self.eta * self.y[i].T.dot(delta[i])
+      
 
   def train(self, x, y):
     self.forward(x)
     self.backward(y)
-    self.errors.append(np.mean(np.square(y - self.y2)))
+    self.errors.append(np.mean(np.square(y - self.y[-1])))
