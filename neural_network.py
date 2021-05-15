@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-class Neural_Network(object):
+class NeuralNetwork(object):
 
   def __init__(self, eta=0.01, layers=(2,10,2)):
     self.eta = eta

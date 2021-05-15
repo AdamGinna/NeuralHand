@@ -4,13 +4,9 @@ import random
 import matplotlib.pyplot as plt
 from examples import Point
 from examples import Examples
-from nn import Neural_Network
+from neural_network import NeuralNetwork
 
 arm_length = 75.0
-pygame.init()
-pygame.font.init()
-myfont = pygame.font.SysFont('Open Sans', 24)
-screen = pygame.display.set_mode([500, 500])
 
 def translate(center, angle):
     return Point(center.x + arm_length * np.sin(angle), center.y - arm_length * np.cos(angle))
@@ -40,7 +36,7 @@ def main():
     np.max(e[0]), np.max(e[1])
     x_train = (np.array(e[0]) + arm_length*2.0)/(arm_length*4.0)*0.8 + 0.1
     y_train = np.array(e[1])/np.pi*0.8 + 0.1
-    NN = Neural_Network(layers=(2,10,2))
+    NN = NeuralNetwork(layers=(2,10,2))
     for i in range(2000):
         NN.train(x_train, y_train)
     
@@ -48,11 +44,16 @@ def main():
     plt.plot(range(len(err)), err)
     plt.show()
 
+    pygame.init()
+    pygame.font.init()
+    myfont = pygame.font.SysFont('Open Sans', 24)
+    screen = pygame.display.set_mode([500, 500])
+
+
     ex2 = Examples(arm_length)
     e2 = ex2.generate(10)
     xx = (np.array(e2[0]) + arm_length*2.0)/(arm_length*4.0)*0.8 + 0.1
     yy = np.array(e2[1])/np.pi*0.8 + 0.1
-    print( yy - NN.forward(xx))
 
 
 
@@ -75,7 +76,6 @@ def main():
                     position = (np.array(position) + arm_length*2.0)/(arm_length*4.0)*0.8 + 0.1
                     ang = NN.forward( (position[0],position[1]) )
                     alpha, beta = unstandarise( ang )
-                    print(alpha, beta)
                     points = alpha_point( np.pi - alpha, -beta,Point(250,250))
                     
                     print(points[0].x,points[0].y)
