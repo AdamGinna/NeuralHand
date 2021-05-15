@@ -1,6 +1,7 @@
 # Neural Hand
 Neural Hand is application with robot which learn position his hand to point. It is possible becouse of implemented artificial neural network. 
-![](img/ex_robot.png)
+
+![robot](img/ex_robot.png)
 
 ## Requirements
 * matplotlib
